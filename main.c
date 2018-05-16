@@ -22,7 +22,7 @@ void	fill_and_print(char *map, char *pos, int size, char fm, char e, int linesiz
 	ft_putstr(map);
 }
 
-int		check_fill(char *map, int size, char e, char f, char fm, int nbline, int linesize, int b)
+int		check_fill(char *map, int size, char e, char f, char fm, int nbline, int linesize, int b, int ten)
 {
 	int		i;
 	int		x;
@@ -63,11 +63,17 @@ int		check_fill(char *map, int size, char e, char f, char fm, int nbline, int li
 		return (-1);
 	else
 	{
+		sizey = size * 2;
 		if (b == 0)
 			fill_and_print(map, &map[i - 1], size, fm, e, linesize);
 		else
-			if (check_fill(map, size + 1, e, f, fm, nbline, linesize, 0) == -1)
+		{
+			while (ten > 0 && check_fill(map, size + ten, e, f, fm, nbline, linesize, 0, 0) == -1)
+				ten--;
+			if (ten == 0)
 				fill_and_print(map, &map[i - 1], size, fm, e, linesize);
+
+		}
 		return (i);
 	}
 }
@@ -101,15 +107,22 @@ void	solve_bsq(char *map, int nbline, char empty, char filled, char filledbyme)
 	char	*opti;
 	int		i;
 	int		result;
+	int		ten;
 
 	i = 0;
 	while (map[i] != '\n')
 		i++;
 	size = opti_size(map, nbline, filled, i);
+	if (nbline > i)
+		ten = i / (i / 10);
+	else
+		ten = nbline / (nbline / 10);
+	if (ten < 2)
+		ten = 2;
 	while (size > 0)
 	{
-		if ((result = check_fill(map, size, empty, filled, filledbyme, nbline, i, 1)) == -1)
-			size -= 2;
+		if ((result = check_fill(map, size, empty, filled, filledbyme, nbline, i, 1, ten)) == -1)
+			size -= ten;
 		else
 			break ;
 	}
