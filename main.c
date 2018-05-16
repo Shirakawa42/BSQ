@@ -38,28 +38,25 @@ int		check_fill(char *map, int size, char e, char f, char fm, int nbline, int li
 		pos = &map[i];
 		error = 0;
 		x = 0;
-		if ((faster = linesize - (i % (linesize + 1))) >= size)
+		while (x < size && (faster = linesize - ((i + x) % (linesize + 1))) > size)
 		{
-			while (x < size)
+			y = 0;
+			while (y < size)
 			{
-				y = 0;
-				while (y < size)
+				if (i < (linesize + 1) * nbline && map[i + x + (y * (linesize + 1))] != e)
 				{
-					if (i < (linesize + 1) * nbline && map[i + x + (y * (linesize + 1))] != e)
-					{
-						i += x;
-						y = size;
-						error = 1;
-					}
-					y++;
+					i += x;
+					y = size;
+					error = 1;
 				}
-				x++;
+				y++;
 			}
+			x++;
 		}
-		else
+		if (x < size)
 		{
-			error = 1;
 			i += faster;
+			error = 1;
 		}
 		i++;
 	}
