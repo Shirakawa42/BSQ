@@ -22,41 +22,40 @@ void	fill_and_print(char *map, char *pos, int size, char fm, char e, int linesiz
 	ft_putstr(map);
 }
 
-int		check_fill(char *map, int size, char e, char f, char fm, int nbline, int linesize)
+int		check_fill(char *map, int size, char e, char f, char fm, int nbline, int linesize, int b)
 {
 	int		i;
-	char	*pos;
 	int		x;
 	int		y;
 	int		error;
 	int		faster;
+	int		linesizewithn;
+	int		nbchar;
+	int		sizey;
 
 	i = 0;
 	error = 1;
-	while (i < (linesize + 1) * nbline && error == 1)
+	linesizewithn = linesize + 1;
+	nbchar = linesizewithn * nbline;
+	sizey = size * linesizewithn;
+	while (i < nbchar && error == 1)
 	{
-		pos = &map[i];
 		error = 0;
 		x = 0;
-		while (x < size && (faster = linesize - ((i + x) % (linesize + 1))) > size)
+		while (x < size)
 		{
 			y = 0;
-			while (y < size)
+			while (y < sizey)
 			{
-				if (i < (linesize + 1) * nbline && map[i + x + (y * (linesize + 1))] != e)
+				if (i < nbchar && map[i + x + y] != e)
 				{
 					i += x;
-					y = size;
+					y = sizey;
 					error = 1;
 				}
-				y++;
+				y += linesizewithn;
 			}
 			x++;
-		}
-		if (x < size)
-		{
-			i += faster;
-			error = 1;
 		}
 		i++;
 	}
@@ -64,7 +63,11 @@ int		check_fill(char *map, int size, char e, char f, char fm, int nbline, int li
 		return (-1);
 	else
 	{
-		fill_and_print(map, pos, size, fm, e, linesize);
+		if (b == 0)
+			fill_and_print(map, &map[i - 1], size, fm, e, linesize);
+		else
+			if (check_fill(map, size + 1, e, f, fm, nbline, linesize, 0) == -1)
+				fill_and_print(map, &map[i - 1], size, fm, e, linesize);
 		return (i);
 	}
 }
@@ -105,8 +108,8 @@ void	solve_bsq(char *map, int nbline, char empty, char filled, char filledbyme)
 	size = opti_size(map, nbline, filled, i);
 	while (size > 0)
 	{
-		if ((result = check_fill(map, size, empty, filled, filledbyme, nbline, i)) == -1)
-			size--;
+		if ((result = check_fill(map, size, empty, filled, filledbyme, nbline, i, 1)) == -1)
+			size -= 2;
 		else
 			break ;
 	}
@@ -134,7 +137,7 @@ void	read_then_solve(char *file)
 	nbline = ft_atoi(map);
 	tmp = map;
 	while (*map >= '0' && *map <= '9')
-		*map++;
+		map++;
 	solve_bsq(map + 4, nbline, map[0], map[1], map[2]);
 	free(tmp);
 }
